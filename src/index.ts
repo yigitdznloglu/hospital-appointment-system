@@ -27,10 +27,12 @@ mongoose.connect(mongoURI)
         console.error('Failed to connect to MongoDB', err);
     });
 
+// Define API Routing
 app.get('/', (req: Request, res: Response) => {
     res.send('Hospital Appointment System API');
 });
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
