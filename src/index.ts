@@ -1,6 +1,7 @@
 import express, {Request, Response} from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import userRoutes from './routes/userRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,7 @@ mongoose.connect(mongoURI)
     });
 
 // Define API Routing
+app.use('/api/users', userRoutes);
 app.get('/', (req: Request, res: Response) => {
     res.send('Hospital Appointment System API');
 });
@@ -36,3 +38,5 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
+
+export default app;
