@@ -1,26 +1,15 @@
 import express, {Request, Response} from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import { PORT, MONGO_URI } from './config';
 import userRoutes from './routes/userRoutes';
 
-// Load environment variables
-dotenv.config();
-
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
 
 // DB Connection
-const mongoURI = process.env.MONGO_URI;
-
-if (!mongoURI) {
-    throw new Error('MONGO_URI is not defined in the environment variables.');
-}
-
-mongoose.connect(mongoURI)
+mongoose.connect(MONGO_URI)
     .then(() => {
         console.log('Connected to MongoDB');
     })
