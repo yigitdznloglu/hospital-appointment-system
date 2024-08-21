@@ -28,7 +28,7 @@ mongoose.connect(mongoURI)
         console.error('Failed to connect to MongoDB', err);
     });
 
-// Define API Routing
+// routes
 app.use('/api/users', userRoutes);
 app.get('/', (req: Request, res: Response) => {
     res.send('Hospital Appointment System API');

@@ -2,7 +2,6 @@ import request from 'supertest';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import exp from 'constants';
 
 // Load environment variables
 dotenv.config();
