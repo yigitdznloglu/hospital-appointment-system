@@ -84,6 +84,30 @@ describe('User Routes', () => {
         expect(res.body).toHaveProperty('error', 'User not found');
     });
 
+    // Get user route
+    it('should get a user successfully', async () => {
+        const res = await request(app)
+            .get('/api/users/me')
+            .set('Authorization', `Bearer ${validToken}`);
+        
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toHaveProperty('name', 'Jane Doe');
+        expect(res.body).toHaveProperty('email', 'janedoe@example.com');
+        expect(res.body).not.toHaveProperty('password');
+        expect(res.body).not.toHaveProperty('salt');
+    });
+
+    it('should return 401 for an invalid token', async () => {
+        const invalidToken = "invalidtoken";
+
+        const res = await request(app)
+            .get('/api/users/me')
+            .set('Authorization', `Bearer ${invalidToken}`);
+
+        expect(res.statusCode).toEqual(401);
+        expect(res.body).toHaveProperty('error', 'Unauthorized access');
+    });
+
     // Delete route
     it('should delete a user successfully', async () => {
         const createUserRes = await request(app)

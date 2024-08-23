@@ -29,6 +29,30 @@ export const createUser = async (req: Request, res: Response) => {
     }
 };
 
+export const getUser = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'Invalid request: user ID is missing' });
+        }
+
+        const user = await User.findById(userId).select('-password -salt');
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            res.status(500).json({ error: 'An unexpected error occured.'});
+        }
+    }
+}
+
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const userId = req.params.id;
