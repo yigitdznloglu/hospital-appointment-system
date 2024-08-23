@@ -93,6 +93,7 @@ describe('User Routes', () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body).toHaveProperty('name', 'Jane Doe');
         expect(res.body).toHaveProperty('email', 'janedoe@example.com');
+        expect(res.body).toHaveProperty('role');
         expect(res.body).not.toHaveProperty('password');
         expect(res.body).not.toHaveProperty('salt');
     });
@@ -108,65 +109,36 @@ describe('User Routes', () => {
         expect(res.body).toHaveProperty('error', 'Unauthorized access');
     });
 
+    it('should return 401 when authentication token is provided', async () => {
+        const res = await request(app)
+            .get('/api/users/me')
+        
+        expect(res.statusCode).toEqual(401);
+        expect(res.body).toHaveProperty('error', 'No token provided');
+    })
+
     // Delete route
     it('should delete a user successfully', async () => {
-        const createUserRes = await request(app)
-            .post('/api/users')
-            .send({
-                name: "John Doe",
-                email: "johndoe@example.com",
-                role: "patient",
-                password: "Password@1"
-            });
-
-        const userId = createUserRes.body._id;
-        createdUserIds.push(userId);
-
         const deleteRes = await request(app)
-            .delete(`/api/users/${userId}`)
+            .delete('/api/users/me')
             .set('Authorization', `Bearer ${validToken}`);
 
         expect(deleteRes.statusCode).toEqual(200);
         expect(deleteRes.body).toHaveProperty('message', 'User deleted successfully');
     });
 
-    it('should return 404 when trying to delete a non-existent user', async () => {
-        const nonExistentUserId = new mongoose.Types.ObjectId();
-
+    it('should return 404 for a non-existent user', async () => {
         const deleteRes = await request(app)
-            .delete(`/api/users/${nonExistentUserId}`)
+            .delete('/api/users/me')
             .set('Authorization', `Bearer ${validToken}`);
 
         expect(deleteRes.statusCode).toEqual(404);
         expect(deleteRes.body).toHaveProperty('error', 'User not found');
     });
 
-    it('should return 400 for invalid user ID format', async () => {
-        const invalidUserId = '12345';
-
-        const deleteRes = await request(app)
-            .delete(`/api/users/${invalidUserId}`)
-            .set('Authorization', `Bearer ${validToken}`);
-
-        expect(deleteRes.statusCode).toEqual(400);
-        expect(deleteRes.body).toHaveProperty('error');
-    });
-
     it('should return 401 when no authentication token is provided', async () => {
-        const createUserRes = await request(app)
-            .post('/api/users')
-            .send({
-                name: "John Doe",
-                email: "johndoe@example.com",
-                role: "patient",
-                password: "Password@1"
-            });
-
-        const userId = createUserRes.body._id;
-        createdUserIds.push(userId);
-
         const deleteRes = await request(app)
-            .delete(`/api/users/${userId}`);
+            .delete(`/api/users/me`);
 
         expect(deleteRes.statusCode).toEqual(401);
         expect(deleteRes.body).toHaveProperty('error', 'No token provided');
@@ -175,20 +147,8 @@ describe('User Routes', () => {
     it('should return 401 for an invalid or expired token', async () => {
         const invalidToken = "invalidtoken";
 
-        const createUserRes = await request(app)
-            .post('/api/users')
-            .send({
-                name: "John Doe",
-                email: "johndoe@example.com",
-                role: "patient",
-                password: "Password@1"
-            });
-
-        const userId = createUserRes.body._id;
-        createdUserIds.push(userId);
-
         const deleteRes = await request(app)
-            .delete(`/api/users/${userId}`)
+            .delete('/api/users/me')
             .set('Authorization', `Bearer ${invalidToken}`);
 
         expect(deleteRes.statusCode).toEqual(401);

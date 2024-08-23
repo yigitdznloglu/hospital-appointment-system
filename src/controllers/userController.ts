@@ -55,7 +55,11 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.id;
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'Invalid request: user ID is missing'})
+        }
 
         const user = await User.findByIdAndDelete(userId);
 
