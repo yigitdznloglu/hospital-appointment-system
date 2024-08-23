@@ -1,10 +1,7 @@
 import request from 'supertest';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-// Load environment variables
-dotenv.config();
+import { MONGO_URI } from '../config';
 
 // Set up a test server
 const app = express();
@@ -18,9 +15,8 @@ app.get('/', (req: Request, res: Response) => {
 
 // Testing DB connection
 beforeAll(async () => {
-    const mongoURI = process.env.MONGO_URI;
-    if (mongoURI) {
-        await mongoose.connect(mongoURI);
+    if (MONGO_URI) {
+        await mongoose.connect(MONGO_URI);
     }
 });
 

@@ -1,7 +1,9 @@
-import { JwtPayload } from 'jsonwebtoken';
+import express from "express";
 
-declare module 'express-serve-static-core' {
+declare global {
+  namespace Express {
     interface Request {
-        user?: JwtPayload | string; // Adjust this based on the shape of your decoded token
+      user?: Record<string,any>
     }
+  }
 }
