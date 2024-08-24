@@ -117,6 +117,42 @@ describe('User Routes', () => {
         expect(res.body).toHaveProperty('error', 'No token provided');
     })
 
+    // Change password route
+    it('should change a user password successfully', async () => {
+        const res = await request(app)
+            .put('/api/users/me')
+            .send({
+                currentPassword: "Password@1",
+                newPassword: "Password@2"
+            })
+            .set('Authorization', `Bearer ${validToken}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toHaveProperty('message', 'Password changed successfully');
+
+        // Attempt to log in w the new password
+        const loginResWithNewPassword = await request(app)
+            .post('/api/users/login')
+            .send({
+                email: "janedoe@example.com",
+                password: "Password@2"
+            });
+
+        expect(loginResWithNewPassword.statusCode).toEqual(200);
+        expect(loginResWithNewPassword.body).toHaveProperty('token');
+
+        // Attempt to log in w the old password
+        const loginResWithOldPassword = await request(app)
+            .post('/api/users/login')
+            .send({
+                email: "janedoe@example.com",
+                password: "Password@1"
+            });
+        
+        expect(loginResWithOldPassword.statusCode).toEqual(400);
+        expect(loginResWithOldPassword.body).toHaveProperty('error', 'Invalid credentials');
+    });
+
     // Delete route
     it('should delete a user successfully', async () => {
         const deleteRes = await request(app)
