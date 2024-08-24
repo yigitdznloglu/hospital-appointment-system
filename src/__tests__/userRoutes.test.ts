@@ -153,6 +153,25 @@ describe('User Routes', () => {
         expect(loginResWithOldPassword.body).toHaveProperty('error', 'Invalid credentials');
     });
 
+    it('should return 401 when no authentication token is provided', async () => {
+        const deleteRes = await request(app)
+            .put(`/api/users/me`);
+
+        expect(deleteRes.statusCode).toEqual(401);
+        expect(deleteRes.body).toHaveProperty('error', 'No token provided');
+    });
+
+    it('should return 401 for an invalid or expired token', async () => {
+        const invalidToken = "invalidtoken";
+
+        const deleteRes = await request(app)
+            .delete('/api/users/me')
+            .set('Authorization', `Bearer ${invalidToken}`);
+
+        expect(deleteRes.statusCode).toEqual(401);
+        expect(deleteRes.body).toHaveProperty('error', 'Unauthorized access');
+    });
+
     // Delete route
     it('should delete a user successfully', async () => {
         const deleteRes = await request(app)
