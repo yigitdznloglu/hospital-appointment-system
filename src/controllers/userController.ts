@@ -98,10 +98,12 @@ export const deleteUser = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid request: user ID is missing '});
         }
 
-        const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found'})
         }
+
+        await user.deleteOne();
 
         res.status(200).json({ message: 'User deleted successfully'})
     } catch (error) {

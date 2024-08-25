@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import mongoose from 'mongoose';
 import { PORT, MONGO_URI } from './config';
 import userRoutes from './routes/userRoutes';
+import appointmentRoutes from './routes/appointmentRoutes';
 
 const app = express();
 
