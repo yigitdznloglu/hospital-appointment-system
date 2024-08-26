@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import mongoose from 'mongoose';
 import { PORT, MONGO_URI } from './config';
 import userRoutes from './routes/userRoutes';
+import departmentRoutes from './routes/departmentRoutes';
 import appointmentRoutes from './routes/appointmentRoutes';
 
 const app = express();
@@ -20,13 +21,16 @@ mongoose.connect(MONGO_URI)
 
 // routes
 app.use('/api/users', userRoutes);
+app.use('/api/departments', departmentRoutes);
 app.get('/', (req: Request, res: Response) => {
     res.send('Hospital Appointment System API');
 });
 
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-})
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
 
 export default app;

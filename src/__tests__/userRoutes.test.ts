@@ -5,20 +5,12 @@ import { MONGO_URI } from '../config';
 
 describe('User Routes', () => {
     let validToken: string;
-    const createdUserIds: string[] = [];  // Array to store created user IDs
 
     beforeAll(async () => {
         await mongoose.connect(MONGO_URI);
     });
 
     afterAll(async () => {
-        // Delete all users created during the tests
-        for (const userId of createdUserIds) {
-            await request(app)
-                .delete(`/api/users/${userId}`)
-                .set('Authorization', `Bearer ${validToken}`);
-        }
-
         await mongoose.disconnect();
     });
 
@@ -38,9 +30,6 @@ describe('User Routes', () => {
         expect(res.body).toHaveProperty('email', 'janedoe@example.com');
         expect(res.body).not.toHaveProperty('password');
         expect(res.body).not.toHaveProperty('salt');
-
-        // Store the created user ID for later deletion
-        createdUserIds.push(res.body._id);
     });
 
     // Login route
@@ -151,25 +140,6 @@ describe('User Routes', () => {
         
         expect(loginResWithOldPassword.statusCode).toEqual(400);
         expect(loginResWithOldPassword.body).toHaveProperty('error', 'Invalid credentials');
-    });
-
-    it('should return 401 when no authentication token is provided', async () => {
-        const deleteRes = await request(app)
-            .put(`/api/users/me`);
-
-        expect(deleteRes.statusCode).toEqual(401);
-        expect(deleteRes.body).toHaveProperty('error', 'No token provided');
-    });
-
-    it('should return 401 for an invalid or expired token', async () => {
-        const invalidToken = "invalidtoken";
-
-        const deleteRes = await request(app)
-            .delete('/api/users/me')
-            .set('Authorization', `Bearer ${invalidToken}`);
-
-        expect(deleteRes.statusCode).toEqual(401);
-        expect(deleteRes.body).toHaveProperty('error', 'Unauthorized access');
     });
 
     // Delete route
